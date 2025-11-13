@@ -7,7 +7,23 @@
 
 ## Environment Setup
 
-### CUDA preparation
+### Building the application
+
+1. **Backend setup**
+  - cd into `backend` and create a virtual python environment with `python3 -m venv venv`.
+  - Activate the environment with `source venv/bin/activate` and install the dependencies with `pip install flask flask-cors torch torchvision pillow`.
+  - Run the backend server with `python app.py`.
+  - Once finished, close the virtual environment with `deactivate`.
+
+2. **Frontend setup**
+  - cd into `frontend` and install the dependencies with `npm install`.
+  - Run the frontend with `npm run start`.
+
+3. **Enjoy :)**
+  - Upload the image you want to style to Content-Image and the style you want it to take into Style-Image.
+  - Play with the parameters as you need and generate your styled image.
+
+### CUDA preparation (Running the notebook)
 
 1. **Confirm GPU compatibility**
   - Run `nvidia-smi` in PowerShell (or use the NVIDIA Control Panel) to confirm that your system has an NVIDIA GPU with at least Compute Capability 5.0.
