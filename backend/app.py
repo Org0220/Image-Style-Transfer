@@ -108,7 +108,6 @@ def run_style_transfer(
 
     generated = content_image.clone().requires_grad_(True)
     optimizer = optim.Adam([generated], lr=learning_rate)
-    log_every = max(num_steps // 10, 1)
 
     for step in range(1, num_steps + 1):
         optimizer.zero_grad()
@@ -124,7 +123,7 @@ def run_style_transfer(
         with torch.no_grad():
             generated.clamp_(0, 1)
 
-        if step % log_every == 0 or step == 1:
+        if step % 10 == 0 or step == 1:
             print(
                 f'Step {step:4d}/{num_steps} | '
                 f'Content: {content_loss.item():.2f} '
