@@ -2,7 +2,7 @@
 
 ## Reports
 - [Proposal](https://liveconcordia-my.sharepoint.com/:w:/g/personal/g_marka_live_concordia_ca/EQWC4O9qFrJFviS6shCktSMBSAPh8qxoPMRqU8wkNr8cGw?e=lDrn7V)
-- Presentation Slides (Optional)
+- [Presentation Slides](https://docs.google.com/presentation/d/1LGmTo22LTEn04PsVCJH7xoMNhfv7Q7CqOI90JervE3w/edit?usp=sharing)
 - [Final Report](https://liveconcordia-my.sharepoint.com/:w:/g/personal/g_marka_live_concordia_ca/EeqOo3BLOP5OqU9KEqV256YBtA555k3RitFEKknKKe1kVw?e=JKO5Dl)
 
 ## Environment Setup
