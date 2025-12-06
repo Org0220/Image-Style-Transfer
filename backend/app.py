@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 import io
 import base64
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -15,15 +14,11 @@ from PIL import Image
 app = Flask(__name__)
 CORS(app)
 
-# Device configuration
+# Use GPU if available
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 IMSIZE = 512 if DEVICE.type == 'cuda' else 256
-
-print(f'Torch version: {torch.__version__}')
-print(f'CUDA available: {torch.cuda.is_available()}')
 if DEVICE.type == 'cuda':
-    print(f'CUDA device: {torch.cuda.get_device_name(0)}')
-print(f'Using device: {DEVICE}')
+    print(f'CUDA device (GPU): {torch.cuda.get_device_name(0)}')
 
 # Normalization constants
 NORMALIZE_MEAN = torch.tensor([0.485, 0.456, 0.406], device=DEVICE)
@@ -48,9 +43,7 @@ def load_vgg19_features() -> torch.nn.Sequential:
     for param in vgg.parameters():
         param.requires_grad_(False)
     return vgg
-
 VGG_FEATURES = load_vgg19_features()
-print("VGG19 model loaded successfully")
 
 # Image processing functions
 def load_image_from_bytes(image_bytes: bytes, max_size: int = IMSIZE) -> torch.Tensor:
@@ -99,7 +92,7 @@ def calculate_style_loss(generated: torch.Tensor, target_gram: torch.Tensor) -> 
     generated_gram = gram_matrix(generated)
     return F.mse_loss(generated_gram, target_gram)
 
-# Style transfer optimization
+# Style transfer optimization loop
 def run_style_transfer(
     content_image: torch.Tensor,
     style_image: torch.Tensor,
@@ -135,7 +128,7 @@ def run_style_transfer(
             print(
                 f'Step {step:4d}/{num_steps} | '
                 f'Content: {content_loss.item():.2f} '
-                f'Style: {style_loss.item():.2f} '
+                f'Style: {style_loss.item()} '
                 f'Total: {total_loss.item():.2f}'
             )
 
@@ -154,7 +147,7 @@ def health():
 @app.route('/style-transfer', methods=['POST'])
 def transfer_style():
     try:
-        # Get images and parameters
+        # Get content and style images and parameters
         if 'content_image' not in request.files or 'style_image' not in request.files:
             return jsonify({"success": False, "error": "Both content_image and style_image are required"}), 400
         
@@ -166,22 +159,17 @@ def transfer_style():
         style_weight = float(request.form.get('style_weight', 1e6))
         learning_rate = float(request.form.get('learning_rate', 0.02))
         
-        print(f'\n=== Starting Style Transfer ===')
+        print(f'\n--- Starting Style Transfer ---')
         print(f'Parameters: steps={num_steps}, content_weight={content_weight}, style_weight={style_weight}')
         
         # Load images
-        print('Loading images...')
         content_bytes = content_file.read()
         style_bytes = style_file.read()
         
         content_img = load_image_from_bytes(content_bytes)
         style_img = load_image_from_bytes(style_bytes)
         
-        print(f'Content image shape: {tuple(content_img.shape)}')
-        print(f'Style image shape: {tuple(style_img.shape)}')
-        
         # Perform style transfer
-        print('Running style transfer...')
         result = run_style_transfer(
             content_img, 
             style_img, 
@@ -192,7 +180,6 @@ def transfer_style():
         )
         
         # Convert to image and encode
-        print('Converting result to image...')
         result_pil = tensor_to_image(result)
         
         buffered = io.BytesIO()
@@ -213,6 +200,4 @@ def transfer_style():
         return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == '__main__':
-    print('\n=== Style Transfer Backend Server ===')
-    print('Starting Flask server...')
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000, use_debugger=False, use_reloader=False)
